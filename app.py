@@ -2,10 +2,10 @@ import base64
 import json
 import os
 import urllib.parse
-import streamlit as st
+from google.oauth2.service_account import Credentials
 import gspread
 import pandas as pd
-from google.oauth2.service_account import Credentials
+import streamlit as st
 
 # ==========================================
 # 1. CONFIGURACIÓN DE PÁGINA
@@ -258,19 +258,15 @@ st.markdown(
 USER_FILE = "usuarios.json"
 WHATSAPP_NUMBER = "5493530000000"
 
-
-# Alcances (scopes) necesarios para acceder a Google Sheets
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive",
 ]
 
-# Nombre EXACTO de tu hoja de cálculo en Google Drive
-GOOGLE_SHEET_NAME = "Usuarios Rôle"  # Cambia esto por el nombre de tu hoja
+GOOGLE_SHEET_NAME = "Usuarios Rôle"
 
 
 def get_gsheet_client():
-    """Conecta con la API de Google Sheets usando las credenciales JSON"""
     creds = Credentials.from_service_account_file(
         "credentials.json", scopes=SCOPES
     )
@@ -287,7 +283,7 @@ def load_users():
         data = sheet.get_all_records()
         df = pd.DataFrame(data)
 
-        if not df.empty:
+        if not df.empty and "tipo" in df.columns:
             registrados = df[df["tipo"] == "registrado"].to_dict(
                 orient="records"
             )
@@ -306,7 +302,6 @@ def save_user(user_data: dict, is_registered: bool):
         client = get_gsheet_client()
         sheet = client.open(GOOGLE_SHEET_NAME).sheet1
 
-        # Preparamos la fila respetando el orden de las columnas
         row = [
             str(user_data.get("nombre", "")),
             str(user_data.get("correo", "")),
@@ -316,7 +311,6 @@ def save_user(user_data: dict, is_registered: bool):
             str(user_data.get("tipo", "")),
         ]
 
-        # Insertamos la fila al final de la planilla
         sheet.append_row(row)
     except Exception as e:
         st.error(f"Error al guardar en Google Sheets: {e}")
@@ -438,7 +432,7 @@ def get_whatsapp_link():
 
 
 # ==========================================
-# 6. PANTALLA DE ACCESO INICIAL (GATEWAY ACTUALIZADA)
+# 6. PANTALLA DE ACCESO INICIAL
 # ==========================================
 if not st.session_state.authenticated:
     logo_src = (
@@ -467,9 +461,6 @@ if not st.session_state.authenticated:
             ["🔑 Iniciar Sesión", "📝 Registrarse", "👤 Entrar como Invitado"]
         )
 
-        # ----------------------------------
-        # PESTAÑA 1: INICIAR SESIÓN
-        # ----------------------------------
         with tab_login:
             st.write("")
             with st.form("form_login"):
@@ -519,9 +510,6 @@ if not st.session_state.authenticated:
                                 "⚠️ Esta cuenta no se encuentra registrada. Por favor, ve a la pestaña **'Registrarse'**."
                             )
 
-        # ----------------------------------
-        # PESTAÑA 2: REGISTRARSE
-        # ----------------------------------
         with tab_register:
             st.write("")
             with st.form("form_register"):
@@ -558,7 +546,6 @@ if not st.session_state.authenticated:
                         users_data = load_users()
                         registrados = users_data.get("registrados", [])
 
-                        # Verificar si ya existe el usuario
                         already_exists = any(
                             u.get("correo", "").lower() == correo_clean
                             or u.get("telefono", "").strip() == telefono_clean
@@ -585,9 +572,6 @@ if not st.session_state.authenticated:
                             st.success("¡Cuenta creada exitosamente!")
                             st.rerun()
 
-        # ----------------------------------
-        # PESTAÑA 3: INVITADO
-        # ----------------------------------
         with tab_invitado:
             st.write("")
             st.info(
@@ -635,7 +619,9 @@ def show_auth_dialog():
         nombre = st.text_input("Nombre", value=user.get("nombre", ""))
         telefono = st.text_input("Teléfono / WhatsApp", value=user.get("telefono", ""))
         if st.form_submit_button("Guardar Cambios", use_container_width=True):
-            user_data = {"nombre": nombre, "telefono": telefono}
+            user_data = user.copy()
+            user_data["nombre"] = nombre
+            user_data["telefono"] = telefono
             save_user(user_data, is_registered=(mode == "registered"))
             st.session_state.user_session["user"] = user_data
             st.success("Datos actualizados.")
@@ -780,7 +766,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# BANNER MOSTRANDO LA MESA ARTESANAL
 if IMG_BANNER_HERO:
     st.markdown(
         f"""
@@ -816,7 +801,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Tres Tarjetas de Características
 feat_c1, feat_c2, feat_c3 = st.columns(3)
 
 with feat_c1:
