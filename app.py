@@ -3,6 +3,9 @@ import json
 import os
 import urllib.parse
 import streamlit as st
+import gspread
+import pandas as pd
+from google.oauth2.service_account import Credentials
 
 # ==========================================
 # 1. CONFIGURACIÓN DE PÁGINA
@@ -256,42 +259,67 @@ USER_FILE = "usuarios.json"
 WHATSAPP_NUMBER = "5493530000000"
 
 
+# Alcances (scopes) necesarios para acceder a Google Sheets
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+# Nombre EXACTO de tu hoja de cálculo en Google Drive
+GOOGLE_SHEET_NAME = "Usuarios Rôle"  # Cambia esto por el nombre de tu hoja
+
+
+def get_gsheet_client():
+    """Conecta con la API de Google Sheets usando las credenciales JSON"""
+    creds = Credentials.from_service_account_file(
+        "credentials.json", scopes=SCOPES
+    )
+    return gspread.authorize(creds)
+
+
 # ==========================================
-# 3. MANEJO DE USUARIOS (PERSISTENCIA)
+# 3. MANEJO DE USUARIOS (GOOGLE SHEETS)
 # ==========================================
 def load_users():
-    if os.path.exists(USER_FILE):
-        try:
-            with open(USER_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            pass
+    try:
+        client = get_gsheet_client()
+        sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+        data = sheet.get_all_records()
+        df = pd.DataFrame(data)
+
+        if not df.empty:
+            registrados = df[df["tipo"] == "registrado"].to_dict(
+                orient="records"
+            )
+            invitados = df[df["tipo"] == "invitado"].to_dict(orient="records")
+            return {"registrados": registrados, "invitados": invitados}
+    except Exception as e:
+        st.error(f"Error al leer Google Sheets: {e}")
+
     return {"registrados": [], "invitados": []}
 
 
 def save_user(user_data: dict, is_registered: bool):
-    data = load_users()
-    key = "registrados" if is_registered else "invitados"
+    user_data["tipo"] = "registrado" if is_registered else "invitado"
 
-    existing_index = -1
-    for idx, u in enumerate(data[key]):
-        if is_registered and (
-            u.get("telefono") == user_data.get("telefono")
-            or u.get("correo") == user_data.get("correo")
-        ):
-            existing_index = idx
-            break
-        elif not is_registered and u.get("id") == user_data.get("id"):
-            existing_index = idx
-            break
+    try:
+        client = get_gsheet_client()
+        sheet = client.open(GOOGLE_SHEET_NAME).sheet1
 
-    if existing_index >= 0:
-        data[key][existing_index] = user_data
-    else:
-        data[key].append(user_data)
+        # Preparamos la fila respetando el orden de las columnas
+        row = [
+            str(user_data.get("nombre", "")),
+            str(user_data.get("correo", "")),
+            str(user_data.get("telefono", "")),
+            str(user_data.get("password", "")),
+            str(user_data.get("id", "")),
+            str(user_data.get("tipo", "")),
+        ]
 
-    with open(USER_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        # Insertamos la fila al final de la planilla
+        sheet.append_row(row)
+    except Exception as e:
+        st.error(f"Error al guardar en Google Sheets: {e}")
 
 
 # ==========================================
