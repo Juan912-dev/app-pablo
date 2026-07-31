@@ -455,37 +455,39 @@ if not st.session_state.authenticated:
                 )
 
                 if submit_login:
-                    users_data = load_users()
-                    registrados = users_data.get("registrados", [])
+                    correo_tel_clean = correo_tel.strip()
                     
-                    # Buscar coincidencia por correo o teléfono
-                    user_found = next(
-                        (u for u in registrados if (u.get("correo") == correo_tel.strip() or u.get("telefono") == correo_tel.strip())),
-                        None
-                    )
-
-                    if user_found:
-                        if user_found.get("password") == password_login:
-                            st.session_state.user_session = {
-                                "mode": "registered",
-                                "user": user_found,
-                            }
-                            st.session_state.authenticated = True
-                            st.rerun()
-                        else:
-                            st.error("Contraseña incorrecta.")
+                    if not correo_tel_clean:
+                        st.error("Por favor, ingresa tu correo o teléfono.")
                     else:
-                        # Si no existe en la base, lo dejamos ingresar o le pedimos registrarse
-                        if correo_tel.strip():
-                            user_data = {"nombre": correo_tel.split("@")[0], "telefono": correo_tel}
-                            st.session_state.user_session = {
-                                "mode": "registered",
-                                "user": user_data,
-                            }
-                            st.session_state.authenticated = True
-                            st.rerun()
+                        users_data = load_users()
+                        registrados = users_data.get("registrados", [])
+                        
+                        # Buscar coincidencia por correo o teléfono
+                        user_found = next(
+                            (
+                                u for u in registrados 
+                                if (u.get("correo") == correo_tel_clean or u.get("telefono") == correo_tel_clean)
+                            ),
+                            None
+                        )
+
+                        if user_found:
+                            # Verificar si la contraseña coincide
+                            if user_found.get("password") == password_login:
+                                st.session_state.user_session = {
+                                    "mode": "registered",
+                                    "user": user_found,
+                                }
+                                st.session_state.authenticated = True
+                                st.rerun()
+                            else:
+                                st.error("Contraseña incorrecta. Inténtalo de nuevo.")
                         else:
-                            st.error("Ingresa tu correo o teléfono.")
+                            # CARTEL DE ADVERTENCIA: No está registrado
+                            st.warning(
+                                "⚠️ Esta cuenta no se encuentra registrada. Por favor, ve a la pestaña **'Registrarse'** para crear tu cuenta."
+                            )
 
         # ----------------------------------
         # PESTAÑA 2: REGISTRARSE (NUEVA)
