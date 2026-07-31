@@ -410,7 +410,7 @@ def get_whatsapp_link():
 # 6. PANTALLA DE ACCESO INICIAL (GATEWAY)
 # ==========================================
 if not st.session_state.authenticated:
-    # Usamos la imagen de la espiral en la tarjeta de login
+    # Usamos ruta relativa compatible con GitHub / Streamlit Cloud
     logo_src = (
         IMG_ESPIRAL
         if IMG_ESPIRAL
@@ -425,36 +425,106 @@ if not st.session_state.authenticated:
             f"""
             <div class="login-container">
                 <img src="{logo_src}" class="login-logo" alt="Rôle Logo" />
-                <h1 style="font-family: 'Playfair Display', serif; color: #FFFFFF; margin-bottom: 1rem; margin-left: 30px; font-size:2.2rem;">Bienvenido a Rôle</h1>
-                <p style="color: #D48B38; font-size: 0.85rem; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 1.5rem; margin-top: 0.5rem;">PANADERÍA Y REPOSTERÍA ARTESANAL</p>
+                <h1 style="font-family: 'Playfair Display', serif; color: #FFFFFF; margin-bottom: 0.5rem; font-size: 2.2rem;">Bienvenido a Rôle</h1>
+                <p style="color: #D48B38; font-size: 0.85rem; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 1.5rem;">PANADERÍA Y REPOSTERÍA ARTESANAL</p>
                 <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 1.5rem;">Elige cómo deseas ingresar para realizar tu pedido</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        tab_cuenta, tab_invitado = st.tabs(
-            ["🔑 Con Cuenta Propia", "👤 Entrar como Invitado"]
+        # Agregamos las 3 opciones de acceso
+        tab_login, tab_register, tab_invitado = st.tabs(
+            ["🔑 Iniciar Sesión", "📝 Registrarse", "👤 Entrar como Invitado"]
         )
 
-        with tab_cuenta:
+        # ----------------------------------
+        # PESTAÑA 1: INICIAR SESIÓN
+        # ----------------------------------
+        with tab_login:
             st.write("")
             with st.form("form_login"):
-                nombre = st.text_input(
-                    "Nombre y Apellido", placeholder="Ej: Juan Pérez"
+                correo_tel = st.text_input(
+                    "Correo o Teléfono", placeholder="Ej: mateo@ejemplo.com"
                 )
-                telefono = st.text_input(
-                    "Teléfono / WhatsApp", placeholder="Ej: 3534123456"
+                password_login = st.text_input(
+                    "Contraseña", type="password", placeholder="•••••"
                 )
-                submit = st.form_submit_button(
-                    "Ingresar con mi Cuenta", use_container_width=True
+                submit_login = st.form_submit_button(
+                    "Ingresar a mi Cuenta", use_container_width=True
                 )
 
-                if submit:
-                    if nombre.strip() and telefono.strip():
+                if submit_login:
+                    users_data = load_users()
+                    registrados = users_data.get("registrados", [])
+                    
+                    # Buscar coincidencia por correo o teléfono
+                    user_found = next(
+                        (u for u in registrados if (u.get("correo") == correo_tel.strip() or u.get("telefono") == correo_tel.strip())),
+                        None
+                    )
+
+                    if user_found:
+                        if user_found.get("password") == password_login:
+                            st.session_state.user_session = {
+                                "mode": "registered",
+                                "user": user_found,
+                            }
+                            st.session_state.authenticated = True
+                            st.rerun()
+                        else:
+                            st.error("Contraseña incorrecta.")
+                    else:
+                        # Si no existe en la base, lo dejamos ingresar o le pedimos registrarse
+                        if correo_tel.strip():
+                            user_data = {"nombre": correo_tel.split("@")[0], "telefono": correo_tel}
+                            st.session_state.user_session = {
+                                "mode": "registered",
+                                "user": user_data,
+                            }
+                            st.session_state.authenticated = True
+                            st.rerun()
+                        else:
+                            st.error("Ingresa tu correo o teléfono.")
+
+        # ----------------------------------
+        # PESTAÑA 2: REGISTRARSE (NUEVA)
+        # ----------------------------------
+        with tab_register:
+            st.write("")
+            with st.form("form_register"):
+                nombre = st.text_input(
+                    "NOMBRE COMPLETO", placeholder="Ej. Mateo Delgado"
+                )
+                correo = st.text_input(
+                    "CORREO ELECTRÓNICO", placeholder="mateo@ejemplo.com"
+                )
+
+                col_tel, col_pass = st.columns(2)
+                with col_tel:
+                    telefono = st.text_input(
+                        "TELÉFONO", placeholder="+51 912345678"
+                    )
+                with col_pass:
+                    password = st.text_input(
+                        "CONTRASEÑA", type="password", placeholder="Mínimo 5 letras"
+                    )
+
+                submit_reg = st.form_submit_button(
+                    "Crear Cuenta", use_container_width=True
+                )
+
+                if submit_reg:
+                    if not nombre.strip() or not correo.strip() or not telefono.strip():
+                        st.error("Por favor completa todos los campos del formulario.")
+                    elif len(password) < 5:
+                        st.error("La contraseña debe tener al menos 5 caracteres.")
+                    else:
                         user_data = {
                             "nombre": nombre.strip(),
+                            "correo": correo.strip(),
                             "telefono": telefono.strip(),
+                            "password": password,
                         }
                         save_user(user_data, is_registered=True)
                         st.session_state.user_session = {
@@ -462,12 +532,12 @@ if not st.session_state.authenticated:
                             "user": user_data,
                         }
                         st.session_state.authenticated = True
+                        st.success("¡Cuenta creada exitosamente!")
                         st.rerun()
-                    else:
-                        st.error(
-                            "Por favor completa tu nombre y teléfono para ingresar."
-                        )
 
+        # ----------------------------------
+        # PESTAÑA 3: INVITADO
+        # ----------------------------------
         with tab_invitado:
             st.write("")
             st.info(
