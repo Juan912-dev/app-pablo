@@ -1,13 +1,13 @@
 {
+  {
   "registrados": [
     {
-      "nombre": "juan",
-      "dni": "39393993"
-    },
-    {
-      "nombre": "juan flores",
-      "telefono": "3536560965"
+      "nombre": "Mateo Delgado",
+      "correo": "mateo@ejemplo.com",
+      "telefono": "+51 912345678",
+      "password": "mi_contraseña"
     }
   ],
   "invitados": []
+}
 }
