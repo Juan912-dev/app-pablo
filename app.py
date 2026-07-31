@@ -30,7 +30,8 @@ def get_base64_image(image_path: str) -> str:
 IMG_LOGO_OFICIAL = get_base64_image("assets/logo_oficial.jpg")
 IMG_BANNER_HERO = get_base64_image("assets/banner_hero.jpg")
 IMG_LOGO_TEXTO = get_base64_image("assets/logo_texto.jpg")
-IMG_ESPIRAL = get_base64_image("assets/images/espiral.png")
+IMG_ESPIRAL = get_base64_image("espiral.png")
+
 
 # ==========================================
 # 2. ESTILOS CSS - DISEÑO OSCURO PREMIUM
