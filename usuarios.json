@@ -1,0 +1,13 @@
+{
+  "registrados": [
+    {
+      "nombre": "juan",
+      "dni": "39393993"
+    },
+    {
+      "nombre": "juan flores",
+      "telefono": "3536560965"
+    }
+  ],
+  "invitados": []
+}
