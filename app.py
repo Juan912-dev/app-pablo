@@ -275,7 +275,10 @@ def save_user(user_data: dict, is_registered: bool):
 
     existing_index = -1
     for idx, u in enumerate(data[key]):
-        if is_registered and u.get("telefono") == user_data.get("telefono"):
+        if is_registered and (
+            u.get("telefono") == user_data.get("telefono")
+            or u.get("correo") == user_data.get("correo")
+        ):
             existing_index = idx
             break
         elif not is_registered and u.get("id") == user_data.get("id"):
@@ -407,10 +410,9 @@ def get_whatsapp_link():
 
 
 # ==========================================
-# 6. PANTALLA DE ACCESO INICIAL (GATEWAY)
+# 6. PANTALLA DE ACCESO INICIAL (GATEWAY ACTUALIZADA)
 # ==========================================
 if not st.session_state.authenticated:
-    # Usamos ruta relativa compatible con GitHub / Streamlit Cloud
     logo_src = (
         IMG_ESPIRAL
         if IMG_ESPIRAL
@@ -433,7 +435,6 @@ if not st.session_state.authenticated:
             unsafe_allow_html=True,
         )
 
-        # Agregamos las 3 opciones de acceso
         tab_login, tab_register, tab_invitado = st.tabs(
             ["🔑 Iniciar Sesión", "📝 Registrarse", "👤 Entrar como Invitado"]
         )
@@ -455,25 +456,27 @@ if not st.session_state.authenticated:
                 )
 
                 if submit_login:
-                    correo_tel_clean = correo_tel.strip()
-                    
-                    if not correo_tel_clean:
-                        st.error("Por favor, ingresa tu correo o teléfono.")
+                    correo_tel_clean = correo_tel.strip().lower()
+
+                    if not correo_tel_clean or not password_login:
+                        st.error("Por favor, ingresa tu correo/teléfono y contraseña.")
                     else:
                         users_data = load_users()
                         registrados = users_data.get("registrados", [])
-                        
-                        # Buscar coincidencia por correo o teléfono
+
                         user_found = next(
                             (
-                                u for u in registrados 
-                                if (u.get("correo") == correo_tel_clean or u.get("telefono") == correo_tel_clean)
+                                u
+                                for u in registrados
+                                if (
+                                    u.get("correo", "").lower() == correo_tel_clean
+                                    or u.get("telefono", "").strip() == correo_tel_clean
+                                )
                             ),
-                            None
+                            None,
                         )
 
                         if user_found:
-                            # Verificar si la contraseña coincide
                             if user_found.get("password") == password_login:
                                 st.session_state.user_session = {
                                     "mode": "registered",
@@ -484,13 +487,12 @@ if not st.session_state.authenticated:
                             else:
                                 st.error("Contraseña incorrecta. Inténtalo de nuevo.")
                         else:
-                            # CARTEL DE ADVERTENCIA: No está registrado
                             st.warning(
-                                "⚠️ Esta cuenta no se encuentra registrada. Por favor, ve a la pestaña **'Registrarse'** para crear tu cuenta."
+                                "⚠️ Esta cuenta no se encuentra registrada. Por favor, ve a la pestaña **'Registrarse'**."
                             )
 
         # ----------------------------------
-        # PESTAÑA 2: REGISTRARSE (NUEVA)
+        # PESTAÑA 2: REGISTRARSE
         # ----------------------------------
         with tab_register:
             st.write("")
@@ -505,11 +507,11 @@ if not st.session_state.authenticated:
                 col_tel, col_pass = st.columns(2)
                 with col_tel:
                     telefono = st.text_input(
-                        "TELÉFONO", placeholder="+51 912345678"
+                        "TELÉFONO", placeholder="+54 9 353 000000"
                     )
                 with col_pass:
                     password = st.text_input(
-                        "CONTRASEÑA", type="password", placeholder="Mínimo 5 letras"
+                        "CONTRASEÑA", type="password", placeholder="Mínimo 5 caracteres"
                     )
 
                 submit_reg = st.form_submit_button(
@@ -517,25 +519,43 @@ if not st.session_state.authenticated:
                 )
 
                 if submit_reg:
-                    if not nombre.strip() or not correo.strip() or not telefono.strip():
+                    correo_clean = correo.strip().lower()
+                    telefono_clean = telefono.strip()
+
+                    if not nombre.strip() or not correo_clean or not telefono_clean:
                         st.error("Por favor completa todos los campos del formulario.")
                     elif len(password) < 5:
                         st.error("La contraseña debe tener al menos 5 caracteres.")
                     else:
-                        user_data = {
-                            "nombre": nombre.strip(),
-                            "correo": correo.strip(),
-                            "telefono": telefono.strip(),
-                            "password": password,
-                        }
-                        save_user(user_data, is_registered=True)
-                        st.session_state.user_session = {
-                            "mode": "registered",
-                            "user": user_data,
-                        }
-                        st.session_state.authenticated = True
-                        st.success("¡Cuenta creada exitosamente!")
-                        st.rerun()
+                        users_data = load_users()
+                        registrados = users_data.get("registrados", [])
+
+                        # Verificar si ya existe el usuario
+                        already_exists = any(
+                            u.get("correo", "").lower() == correo_clean
+                            or u.get("telefono", "").strip() == telefono_clean
+                            for u in registrados
+                        )
+
+                        if already_exists:
+                            st.warning(
+                                "⚠️ Ya existe un usuario con este correo o teléfono. Ve a **'Iniciar Sesión'**."
+                            )
+                        else:
+                            user_data = {
+                                "nombre": nombre.strip(),
+                                "correo": correo_clean,
+                                "telefono": telefono_clean,
+                                "password": password,
+                            }
+                            save_user(user_data, is_registered=True)
+                            st.session_state.user_session = {
+                                "mode": "registered",
+                                "user": user_data,
+                            }
+                            st.session_state.authenticated = True
+                            st.success("¡Cuenta creada exitosamente!")
+                            st.rerun()
 
         # ----------------------------------
         # PESTAÑA 3: INVITADO
@@ -555,7 +575,10 @@ if not st.session_state.authenticated:
                 nombre_final = (
                     nombre_invitado.strip() if nombre_invitado.strip() else "Invitado"
                 )
-                user_data = {"id": f"guest_{os.urandom(3).hex()}", "nombre": nombre_final}
+                user_data = {
+                    "id": f"guest_{os.urandom(3).hex()}",
+                    "nombre": nombre_final,
+                }
                 save_user(user_data, is_registered=False)
                 st.session_state.user_session = {
                     "mode": "guest",
