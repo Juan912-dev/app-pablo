@@ -824,7 +824,7 @@ st.divider()
 st.markdown(
     """
     <div style="text-align: center; color: #64748B; font-size: 0.8rem; padding: 2rem 0;">
-        <p>© 2026 Rôle Repostería & Panadería Artesanal - Villa María, Córdoba.</p>
+        <p>© 2026 Rôle Repostería Y Panadería Artesanal - Villa María, Córdoba.</p>
     </div>
     """,
     unsafe_allow_html=True,
