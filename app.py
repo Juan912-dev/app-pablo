@@ -267,8 +267,8 @@ GOOGLE_SHEET_NAME = "Usuarios Rôle"
 
 
 def get_gsheet_client():
-    creds = Credentials.from_service_account_file(
-        "credentials.json", scopes=SCOPES
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"], scopes=SCOPES
     )
     return gspread.authorize(creds)
 
