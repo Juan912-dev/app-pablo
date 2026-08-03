@@ -333,6 +333,8 @@ SCOPES = [
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1DTY7NMHfMy4lews3gN10Rrel6bIRcJHcyJvLNU06PfQ/edit?gid=1482332449#gid=1482332449"
 
 
+# Carga la conexión a Google una sola vez en memoria para optimizar velocidad
+@st.cache_resource
 def get_gsheet_client():
     creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 
