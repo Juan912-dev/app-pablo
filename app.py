@@ -6,21 +6,14 @@ import sys
 import urllib.parse
 
 # 1. Intentamos importar; si Streamlit Cloud falló en instalar, lo instalamos por fuerza en el momento:
-try:
-    from google.oauth2.service_account import Credentials
-    import gspread
-except ModuleNotFoundError:
-    subprocess.check_call([
-        sys.executable, "-m", "pip", "install", 
-        "google-auth", "google-auth-oauthlib", "google-auth-httplib2", 
-        "gspread", "pandas", "streamlit"
-    ])
-    from google.oauth2.service_account import Credentials
-    import gspread
-
-# 2. Resto de tus importaciones normales:
+import base64
+import json
+import os
+import urllib.parse
 import pandas as pd
 import streamlit as st
+import gspread
+from google.oauth2.service_account import Credentials
 
 # ==========================================
 # 1. CONFIGURACIÓN DE PÁGINA
@@ -34,6 +27,7 @@ st.set_page_config(
 
 
 # Helper para convertir imágenes locales a Base64 e inyectarlas en HTML
+@st.cache_data
 def get_base64_image(image_path: str) -> str:
     if os.path.exists(image_path):
         ext = image_path.split(".")[-1].lower()
