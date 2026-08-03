@@ -1,9 +1,24 @@
 import base64
 import json
 import os
+import subprocess
+import sys
 import urllib.parse
-from google.oauth2.service_account import Credentials
-import gspread
+
+# 1. Intentamos importar; si Streamlit Cloud falló en instalar, lo instalamos por fuerza en el momento:
+try:
+    from google.oauth2.service_account import Credentials
+    import gspread
+except ModuleNotFoundError:
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", 
+        "google-auth", "google-auth-oauthlib", "google-auth-httplib2", 
+        "gspread", "pandas", "streamlit"
+    ])
+    from google.oauth2.service_account import Credentials
+    import gspread
+
+# 2. Resto de tus importaciones normales:
 import pandas as pd
 import streamlit as st
 
