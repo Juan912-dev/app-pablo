@@ -320,8 +320,23 @@ st.markdown(
         border-color: #D48B38 !important;
     }
 
-    /* 📱 ADAPTACIÓN OPTIMIZADA PARA CELULARES (MOBILE) */
+    /* 📱 ADAPTACIÓN DE ANCHO COMPLETO PARA CELULARES (MOBILE FULL-WIDTH) */
     @media (max-width: 768px) {
+        /* Quita los márgenes blancos/oscuros laterales de Streamlit en celular */
+        .block-container, [data-testid="stMainBlockContainer"] {
+            padding-left: 0.4rem !important;
+            padding-right: 0.4rem !important;
+        }
+
+        /* Fuerza a las columnas de Streamlit a tomar el 100% de ancho */
+        [data-testid="stColumn"], [data-testid="column"] {
+            width: 100% !important;
+            min-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-bottom: 1rem !important;
+        }
+
         /* 1. Navbar responsive */
         .role-navbar {
             flex-direction: column !important;
@@ -341,23 +356,31 @@ st.markdown(
             padding-top: 8px !important;
         }
 
-        /* 2. Login container ancho y espacioso en celular */
+        /* 2. Pantalla de Bienvenida / Login maximizada */
         .login-container {
-            width: 92% !important;
-            max-width: none !important;
-            padding: 2rem 1.2rem !important;
-            margin: 1rem auto !important;
+            width: 98% !important;
+            max-width: 98% !important;
+            padding: 1.8rem 1rem !important;
+            margin: 0.5rem auto !important;
+            box-sizing: border-box !important;
         }
 
         .login-container h1, .login-container h2 {
-            font-size: 1.8rem !important;
+            font-size: 1.7rem !important;
             word-break: normal !important;
         }
 
-        /* 3. Paquetes y características: Apilar verticalmente para darles el 100% del ancho */
+        /* 3. Paquetes y Misión: Ancho total y padding reducido para máxima amplitud */
+        .mission-card, .feature-box, .banner-hero-box {
+            width: 100% !important;
+            padding: 1.2rem 0.8rem !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 4. Disposición vertical de bloques */
         [data-testid="stHorizontalBlock"] {
             flex-direction: column !important;
-            gap: 1.2rem !important;
+            gap: 1rem !important;
         }
 
         [data-testid="stHorizontalBlock"] > div {
@@ -365,7 +388,7 @@ st.markdown(
             min-width: 100% !important;
         }
 
-        /* Excepción: Botones superiores (Perfil y Caja) se mantienen lado a lado */
+        /* Excepción: Botones superiores (Perfil y Caja) se mantienen en 2 columnas paralelas */
         .block-container > div:nth-child(2) [data-testid="stHorizontalBlock"],
         div:has(> [data-testid="stHorizontalBlock"]) [data-testid="stHorizontalBlock"]:first-child {
             flex-direction: row !important;
@@ -378,9 +401,8 @@ st.markdown(
             min-width: 0 !important;
         }
 
-        /* Hero Heading más legible en pantallas chicas */
         .hero-heading {
-            font-size: 2.2rem !important;
+            font-size: 2.1rem !important;
         }
     }
 
