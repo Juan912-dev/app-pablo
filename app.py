@@ -310,6 +310,12 @@ st.markdown(
     /* OCULTAR FOOTER Y BOTÓN DE MANAGE APP */
     footer {visibility: hidden !important; display: none !important;}
     [data-testid="stStatusWidget"] {visibility: hidden !important; display: none !important;}
+
+    /* OCULTAR INSIGNIA FLOTANTE Y BADGE DE STREAMLIT ABAJO A LA DERECHA */
+    .viewerBadge_container, div[class*="viewerBadge"], [data-testid="stStatusWidget"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
     
     </style>
     """,
