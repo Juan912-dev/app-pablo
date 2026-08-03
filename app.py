@@ -503,7 +503,7 @@ def get_whatsapp_link():
     cart = st.session_state.cart
     user = session.get("user", {})
 
-    msg = ["🥮 *NUEVO PEDIDO EN RÔLE REPOSTERÍA*\n"]
+    msg = ["🌀 *NUEVO PEDIDO EN RÔLE REPOSTERÍA*\n"]
     msg.append(f"👤 *Cliente:* {user.get('nombre', 'N/A')}")
     if user.get("telefono"):
         msg.append(f"📱 *Teléfono:* {user.get('telefono')}")
@@ -521,7 +521,15 @@ def get_whatsapp_link():
             msg.append(f"• {qty}x {p['name']}")
 
     msg.append(f"\n💰 *Total Paquete:* ${pkg['price']:,}")
-    return f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote('\n'.join(msg))}"
+    
+    # 1. Unimos todo el texto
+    texto_completo = "\n".join(msg)
+    
+    # 2. Codificamos estrictamente en UTF-8 para proteger emojis y tildes
+    texto_codificado = urllib.parse.quote(texto_completo.encode("utf-8"), safe="")
+    
+    # 3. Usamos api.whatsapp.com que es 100% estable con emojis en PC y celulares
+    return f"https://api.whatsapp.com/send?phone={WHATSAPP_NUMBER}&text={texto_codificado}"
 
 
 # ==========================================
