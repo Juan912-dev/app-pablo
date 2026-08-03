@@ -334,9 +334,13 @@ GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1DTY7NMHfMy4lews3gN10
 
 
 def get_gsheet_client():
+    creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+
     creds = Credentials.from_service_account_info(
-        st.secrets["gcp_service_account"], scopes=SCOPES
+        creds_info,
+        scopes=SCOPES
     )
+
     return gspread.authorize(creds)
 
 
