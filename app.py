@@ -8,6 +8,7 @@ import pandas as pd
 import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
+import streamlit.components.v1 as components
 
 # ==========================================
 # 1. CONFIGURACIÓN DE PÁGINA
@@ -811,6 +812,19 @@ def show_cart_dialog():
 # ==========================================
 # 8. BARRA DE NAVEGACIÓN PRINCIPAL
 # ==========================================
+# 🚀 FORZAR SCROLL AL TOPE AL CARGAR LA PÁGINA PRINCIPAL
+components.html(
+    """
+    <script>
+        window.parent.scrollTo(0, 0);
+        const mainContainer = window.parent.document.querySelector('[data-testid="stAppViewContainer"]');
+        if (mainContainer) {
+            mainContainer.scrollTop = 0;
+        }
+    </script>
+    """,
+    height=0,
+)
 # Se obtiene user_session de forma segura: si no existe o es None, usa {}
 session = st.session_state.get("user_session") or {}
 current_user = session.get("user", {})
