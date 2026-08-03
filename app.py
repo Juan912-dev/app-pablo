@@ -148,6 +148,52 @@ st.markdown(
         border: 1px solid #D48B38;
     }
 
+    .role-navbar-links {
+        display: flex;
+        gap: 1.5rem;
+        color: #CBD5E1;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .role-navbar-links a {
+        color: inherit;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    /* 📱 ADAPTACIÓN PARA CELULARES (MOBILE) */
+    @media (max-width: 768px) {
+        .role-navbar {
+            flex-direction: column !important;
+            align-items: center !important;
+            padding: 0.8rem 0.5rem !important;
+            gap: 10px !important;
+        }
+
+        .role-navbar-links {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 8px 14px !important;
+            font-size: 0.78rem !important;
+            width: 100% !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding-top: 8px !important;
+        }
+
+        /* Fuerza a que los botones de Usuario y Carrito se mantengan lado a lado en celular */
+        [data-testid="stHorizontalBlock"] {
+            flex-direction: row !important;
+            gap: 8px !important;
+        }
+        
+        [data-testid="stHorizontalBlock"] > div {
+            width: 50% !important;
+            min-width: 0 !important;
+        }
+    }
+
     /* BARRA DE ESTADO DEL PAQUETE (FIJA AL HACER SCROLL) */
     .role-subbar {
         background-color: #091626;
@@ -812,7 +858,6 @@ def show_cart_dialog():
 # ==========================================
 # 8. BARRA DE NAVEGACIÓN PRINCIPAL
 # ==========================================
-# 🚀 FORZAR SCROLL AL TOPE AL CARGAR LA PÁGINA PRINCIPAL
 components.html(
     """
     <script>
@@ -825,7 +870,7 @@ components.html(
     """,
     height=0,
 )
-# Se obtiene user_session de forma segura: si no existe o es None, usa {}
+
 session = st.session_state.get("user_session") or {}
 current_user = session.get("user", {})
 user_name = current_user.get("nombre", "Invitado")
@@ -840,43 +885,46 @@ logo_nav_src = (
     else "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100"
 )
 
+# Navbar HTML con clases preparadas para Mobile CSS
 st.markdown(
     f"""
     <div class="role-navbar">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
             <img src="{logo_nav_src}" class="nav-logo-img" alt="Rôle Logo" />
             <div>
-                <div style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #FFFFFF; letter-spacing: 2px; line-height: 1;">RÔLE</div>
-                <div style="font-size: 0.65rem; color: #D48B38; letter-spacing: 1.5px; font-weight: 600;">LO MEJOR EN CADA UNO</div>
+                <div style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #FFFFFF; letter-spacing: 2px; line-height: 1;">RÔLE</div>
+                <div style="font-size: 0.6rem; color: #D48B38; letter-spacing: 1.5px; font-weight: 600;">LO MEJOR EN CADA UNO</div>
             </div>
         </div>
-        <div style="display: flex; gap: 2rem; color: #CBD5E1; font-size: 0.9rem; font-weight: 500;">
-            <a href="#mision" style="color: inherit; text-decoration: none;">Misión & Historia</a>
-            <a href="#paquetes" style="color: inherit; text-decoration: none;">Oferta de Paquetes</a>
-            <a href="#productos" style="color: inherit; text-decoration: none;">Catálogo de Productos</a>
+        <div class="role-navbar-links">
+            <a href="#mision">Misión & Historia</a>
+            <a href="#paquetes">Oferta de Paquetes</a>
+            <a href="#productos">Catálogo de Productos</a>
         </div>
-        <div></div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-top_c1, top_c2 = st.columns([5, 1])
-with top_c2:
-    col_u, col_c = st.columns(2)
-    with col_u:
-        label_user = (
-            f"👤 {user_name[:10]}..."
-            if len(user_name) > 10
-            else f"👤 {user_name}"
-        )
-        if is_guest:
-            label_user += " (Inv)"
-        if st.button(label_user):
-            show_auth_dialog()
-    with col_c:
-        if st.button(f"🛒 Caja {current_cart_count}/{target_quota}"):
-            show_cart_dialog()
+st.write("")
+
+# Botones superiores (Perfil y Caja) en 2 columnas parejas
+col_u, col_c = st.columns(2)
+with col_u:
+    label_user = (
+        f"👤 {user_name[:10]}..."
+        if len(user_name) > 10
+        else f"👤 {user_name}"
+    )
+    if is_guest:
+        label_user += " (Inv)"
+    if st.button(label_user, use_container_width=True):
+        show_auth_dialog()
+
+with col_c:
+    if st.button(f"🛒 Caja {current_cart_count}/{target_quota}", use_container_width=True):
+        show_cart_dialog()
+
 
 # ==========================================
 # 9. BARRA INFERIOR FIJA Y CLICABLE (CARRITO)
