@@ -278,7 +278,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-GOOGLE_SHEET_NAME = "Usuarios Rôle"
+GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1DTY7NMHfMy4lews3gN10Rrel6bIRcJHcyJvLNU06PfQ/edit?gid=1482332449#gid=1482332449"
 
 
 def get_gsheet_client():
@@ -289,19 +289,18 @@ def get_gsheet_client():
 
 
 # ==========================================
-# 3. MANEJO DE USUARIOS (GOOGLE SHEETS)
+# 3. MANEJO DE USUARIOS Y PEDIDOS (GOOGLE SHEETS)
 # ==========================================
 def load_users():
     try:
         client = get_gsheet_client()
-        sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+        # Cambiamos .open por .open_by_url
+        sheet = client.open_by_url(GOOGLE_SHEET_URL).worksheet("Usuarios") # O .sheet1
         data = sheet.get_all_records()
         df = pd.DataFrame(data)
 
         if not df.empty and "tipo" in df.columns:
-            registrados = df[df["tipo"] == "registrado"].to_dict(
-                orient="records"
-            )
+            registrados = df[df["tipo"] == "registrado"].to_dict(orient="records")
             invitados = df[df["tipo"] == "invitado"].to_dict(orient="records")
             return {"registrados": registrados, "invitados": invitados}
     except Exception as e:
@@ -315,7 +314,7 @@ def save_user(user_data: dict, is_registered: bool):
 
     try:
         client = get_gsheet_client()
-        sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+        sheet = client.open_by_url(GOOGLE_SHEET_URL).worksheet("Usuarios") # O .sheet1
 
         row = [
             str(user_data.get("nombre", "")),
@@ -328,7 +327,50 @@ def save_user(user_data: dict, is_registered: bool):
 
         sheet.append_row(row)
     except Exception as e:
-        st.error(f"Error al guardar en Google Sheets: {e}")
+        st.error(f"Error al guardar usuario en Google Sheets: {e}")
+
+
+def save_order():
+    """Guarda la selección de productos y el paquete del usuario en Google Sheets."""
+    try:
+        client = get_gsheet_client()
+        spreadsheet = client.open_by_url(GOOGLE_SHEET_URL)
+        
+        # Intenta usar la pestaña 'Pedidos', si no existe usa la primera hoja
+        try:
+            sheet = spreadsheet.worksheet("Pedidos")
+        except Exception:
+            sheet = spreadsheet.sheet1
+
+        session = st.session_state.user_session or {}
+        user = session.get("user", {})
+        pkg = st.session_state.selected_package
+        cart = st.session_state.cart
+
+        # Armamos el detalle de productos elegidos
+        productos_elegidos = []
+        for p in PRODUCTS:
+            qty = cart.get(p["id"], 0)
+            if qty > 0:
+                productos_elegidos.append(f"{qty}x {p['name']}")
+        
+        detalle_productos = ", ".join(productos_elegidos)
+        tipo_usuario = "Registrado" if session.get("mode") == "registered" else "Invitado"
+
+        row = [
+            str(user.get("nombre", "N/A")),
+            str(user.get("telefono", "N/A")),
+            tipo_usuario,
+            str(pkg.get("name", "")),
+            detalle_productos,
+            pkg.get("price", 0)
+        ]
+
+        sheet.append_row(row)
+        return True
+    except Exception as e:
+        st.error(f"Error al registrar el pedido en Google Sheets: {e}")
+        return False
 
 
 # ==========================================
@@ -681,17 +723,21 @@ def show_cart_dialog():
                 f"Debes completar el mínimo de {pkg['minCount']} productos para enviar tu pedido."
             )
         else:
-            wa_url = get_whatsapp_link()
-            st.markdown(
-                f"""
-                <a href="{wa_url}" target="_blank" style="text-decoration: none;">
-                    <div style="background-color: #D48B38; color: #071220; padding: 14px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 15px;">
-                        📲 Enviar Pedido directo por WhatsApp
-                    </div>
-                </a>
-                """,
-                unsafe_allow_html=True,
-            )
+            # Botón para confirmar el pedido y guardarlo
+            if st.button("📲 Confirmar Pedido y Registrar", use_container_width=True):
+                if save_order():
+                    st.success("¡Pedido registrado con éxito en la planilla!")
+                    wa_url = get_whatsapp_link()
+                    st.markdown(
+                        f"""
+                        <a href="{wa_url}" target="_blank" style="text-decoration: none;">
+                            <div style="background-color: #25D366; color: #FFFFFF; padding: 14px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 10px;">
+                                Continuar a WhatsApp ➔
+                            </div>
+                        </a>
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
 
 # ==========================================
