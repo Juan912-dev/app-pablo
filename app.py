@@ -503,7 +503,7 @@ def get_whatsapp_link():
     cart = st.session_state.cart
     user = session.get("user", {})
 
-    msg = ["🌀 *NUEVO PEDIDO EN RÔLE REPOSTERÍA*\n"]
+    msg = ["🥮 *NUEVO PEDIDO EN RÔLE REPOSTERÍA*\n"]
     msg.append(f"👤 *Cliente:* {user.get('nombre', 'N/A')}")
     if user.get("telefono"):
         msg.append(f"📱 *Teléfono:* {user.get('telefono')}")
