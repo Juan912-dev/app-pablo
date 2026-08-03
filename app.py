@@ -275,7 +275,7 @@ st.markdown(
 )
 
 USER_FILE = "usuarios.json"
-WHATSAPP_NUMBER = "549353650965"
+WHATSAPP_NUMBER = "5493536560965"
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
