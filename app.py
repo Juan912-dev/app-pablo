@@ -503,8 +503,8 @@ PRODUCTS = [
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
-if "user_session" not in st.session_state:
-    st.session_state.user_session = None
+if "user_session" not in st.session_state or st.session_state.user_session is None:
+    st.session_state.user_session = {}
 
 if "selected_package" not in st.session_state:
     st.session_state.selected_package = PACKAGES[1]
@@ -807,9 +807,12 @@ def show_cart_dialog():
 # ==========================================
 # 8. BARRA DE NAVEGACIÓN PRINCIPAL
 # ==========================================
-current_user = st.session_state.user_session.get("user", {})
+# Se obtiene user_session de forma segura: si no existe o es None, usa {}
+session = st.session_state.get("user_session") or {}
+current_user = session.get("user", {})
 user_name = current_user.get("nombre", "Invitado")
-is_guest = st.session_state.user_session.get("mode") == "guest"
+is_guest = session.get("mode") == "guest"
+
 current_cart_count = get_total_cart_count()
 target_quota = st.session_state.selected_package["itemCount"]
 
