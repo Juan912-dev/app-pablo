@@ -4,12 +4,6 @@ import os
 import subprocess
 import sys
 import urllib.parse
-
-# 1. Intentamos importar; si Streamlit Cloud falló en instalar, lo instalamos por fuerza en el momento:
-import base64
-import json
-import os
-import urllib.parse
 import pandas as pd
 import streamlit as st
 import gspread
