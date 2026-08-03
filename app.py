@@ -162,38 +162,6 @@ st.markdown(
         white-space: nowrap;
     }
 
-    /* 📱 ADAPTACIÓN PARA CELULARES (MOBILE) */
-    @media (max-width: 768px) {
-        .role-navbar {
-            flex-direction: column !important;
-            align-items: center !important;
-            padding: 0.8rem 0.5rem !important;
-            gap: 10px !important;
-        }
-
-        .role-navbar-links {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            justify-content: center !important;
-            gap: 8px 14px !important;
-            font-size: 0.78rem !important;
-            width: 100% !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-            padding-top: 8px !important;
-        }
-
-        /* Fuerza a que los botones de Usuario y Carrito se mantengan lado a lado en celular */
-        [data-testid="stHorizontalBlock"] {
-            flex-direction: row !important;
-            gap: 8px !important;
-        }
-        
-        [data-testid="stHorizontalBlock"] > div {
-            width: 50% !important;
-            min-width: 0 !important;
-        }
-    }
-
     /* BARRA DE ESTADO DEL PAQUETE (FIJA AL HACER SCROLL) */
     .role-subbar {
         background-color: #091626;
@@ -350,6 +318,70 @@ st.markdown(
         background-color: #D48B38 !important;
         color: #071220 !important;
         border-color: #D48B38 !important;
+    }
+
+    /* 📱 ADAPTACIÓN OPTIMIZADA PARA CELULARES (MOBILE) */
+    @media (max-width: 768px) {
+        /* 1. Navbar responsive */
+        .role-navbar {
+            flex-direction: column !important;
+            align-items: center !important;
+            padding: 0.8rem 0.5rem !important;
+            gap: 10px !important;
+        }
+
+        .role-navbar-links {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 8px 14px !important;
+            font-size: 0.78rem !important;
+            width: 100% !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding-top: 8px !important;
+        }
+
+        /* 2. Login container ancho y espacioso en celular */
+        .login-container {
+            width: 92% !important;
+            max-width: none !important;
+            padding: 2rem 1.2rem !important;
+            margin: 1rem auto !important;
+        }
+
+        .login-container h1, .login-container h2 {
+            font-size: 1.8rem !important;
+            word-break: normal !important;
+        }
+
+        /* 3. Paquetes y características: Apilar verticalmente para darles el 100% del ancho */
+        [data-testid="stHorizontalBlock"] {
+            flex-direction: column !important;
+            gap: 1.2rem !important;
+        }
+
+        [data-testid="stHorizontalBlock"] > div {
+            width: 100% !important;
+            min-width: 100% !important;
+        }
+
+        /* Excepción: Botones superiores (Perfil y Caja) se mantienen lado a lado */
+        .block-container > div:nth-child(2) [data-testid="stHorizontalBlock"],
+        div:has(> [data-testid="stHorizontalBlock"]) [data-testid="stHorizontalBlock"]:first-child {
+            flex-direction: row !important;
+            gap: 8px !important;
+        }
+        
+        .block-container > div:nth-child(2) [data-testid="stHorizontalBlock"] > div,
+        div:has(> [data-testid="stHorizontalBlock"]) [data-testid="stHorizontalBlock"]:first-child > div {
+            width: 50% !important;
+            min-width: 0 !important;
+        }
+
+        /* Hero Heading más legible en pantallas chicas */
+        .hero-heading {
+            font-size: 2.2rem !important;
+        }
     }
 
     /* OCULTAR BARRA SUPERIOR Y TOOLBAR DE STREAMLIT */
