@@ -69,20 +69,36 @@ st.markdown(
     [data-testid="stHeader"] { background: transparent !important; }
     #MainMenu, footer { visibility: hidden; }
 
-    /* BARRA FLOTANTE INFERIOR FIJA PARA EL CARRITO */
-    .floating-cart-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #0A1B2E;
-        border-top: 2px solid #D48B38;
-        padding: 10px 20px;
-        z-index: 99999;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    /* BARRA INFERIOR FIJA Y 100% CLICABLE */
+    .element-container:has(.fixed-bottom-marker) + .element-container {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 99999 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .element-container:has(.fixed-bottom-marker) + .element-container button {
+        width: 100% !important;
+        height: 52px !important;
+        background-color: #0A1B2E !important;
+        color: #F1F5F9 !important;
+        border: none !important;
+        border-top: 2px solid #D48B38 !important;
+        border-radius: 0 !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7) !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .element-container:has(.fixed-bottom-marker) + .element-container button:hover {
+        background-color: #102742 !important;
+        color: #D48B38 !important;
     }
 
     /* PANTALLA DE LOGIN / PORTADA */
@@ -814,30 +830,20 @@ with top_c2:
             show_cart_dialog()
 
 # ==========================================
-# 9. BARRA FLOTANTE FIJA DEL CARRITO (SIEMPRE VISIBLE Y CLICABLE)
+# 9. BARRA INFERIOR FIJA Y CLICABLE (CARRITO)
 # ==========================================
 pkg_active_name = st.session_state.selected_package["name"]
 
-st.markdown(
-    f"""
-    <div class="floating-cart-bar">
-        <div>
-            <span style="color: #D48B38; font-weight: 700; font-size: 1rem;">📦 {pkg_active_name}</span><br/>
-            <span style="color: #F1F5F9; font-size: 0.85rem;">{current_cart_count} de {target_quota} productos en tu caja</span>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# Marcador invisible para que el CSS sepa exactamente qué botón fijar abajo
+st.markdown('<div class="fixed-bottom-marker"></div>', unsafe_allow_html=True)
 
-col_espacio, col_boton_flotante = st.columns([4, 2])
-with col_boton_flotante:
-    if st.button(
-        f"🛒 Ver mi Caja ({current_cart_count}/{target_quota})",
-        key="btn_cart_floating",
-        use_container_width=True
-    ):
-        show_cart_dialog()
+# Botón que ocupa toda la franja inferior y abre el carrito al hacer clic en cualquier parte
+if st.button(
+    f"📦 {pkg_active_name}: {current_cart_count} de {target_quota} productos en tu caja   |   🛒 CLIC AQUÍ PARA VER TU CAJA",
+    key="btn_bottom_bar_clickable",
+    use_container_width=True
+):
+    show_cart_dialog()
 
 # ==========================================
 # 10. SECCIÓN HERO CENTRAL CON LOGO OFICIAL
