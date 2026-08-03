@@ -56,6 +56,21 @@ IMG_ESPIRAL = get_base64_image("espiral.png")
 # ==========================================
 st.markdown(
     """
+    /* BARRA FLOTANTE INFERIOR FIJA PARA EL CARRITO */
+    .floating-cart-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #0A1B2E;
+        border-top: 2px solid #D48B38;
+        padding: 10px 20px;
+        z-index: 99999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
@@ -471,7 +486,7 @@ def get_whatsapp_link():
     cart = st.session_state.cart
     user = session.get("user", {})
 
-    msg = ["🌀 *NUEVO PEDIDO EN RÔLE REPOSTERÍA*\n"]
+    msg = ["🥮 *NUEVO PEDIDO EN RÔLE REPOSTERÍA*\n"]
     msg.append(f"👤 *Cliente:* {user.get('nombre', 'N/A')}")
     if user.get("telefono"):
         msg.append(f"📱 *Teléfono:* {user.get('telefono')}")
