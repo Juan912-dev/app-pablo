@@ -47,14 +47,29 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-    /* Reset global */
+    /* Reset global y scroll fluido */
     html, body, [data-testid="stAppViewContainer"] {
         background-color: #071220 !important;
         color: #F1F5F9;
         font-family: 'Plus Jakarta Sans', sans-serif;
+        scroll-behavior: smooth !important;
     }
 
-    [data-testid="stHeader"] { background: transparent !important; }
+    /* 🚀 QUITAR ESPACIOS VACÍOS SUPERIORES DE STREAMLIT */
+    [data-testid="stAppViewContainer"] > .main {
+        padding-top: 0 !important;
+    }
+
+    .block-container, [data-testid="stMainBlockContainer"] {
+        padding-top: 0rem !important;
+        padding-bottom: 5rem !important;
+        max-width: 100% !important;
+    }
+    
+    [data-testid="stHeader"] { 
+        display: none !important;
+        background: transparent !important; 
+    }
     #MainMenu, footer { visibility: hidden; }
 
     /* BARRA INFERIOR FIJA Y 100% CLICABLE */
@@ -292,7 +307,6 @@ st.markdown(
 
     /* OCULTAR BARRA SUPERIOR Y TOOLBAR DE STREAMLIT */
     header {visibility: hidden !important; display: none !important;}
-    [data-testid="stHeader"] {display: none !important;}
     [data-testid="stToolbar"] {visibility: hidden !important; display: none !important;}
     
     /* OCULTAR FOOTER Y BOTÓN DE MANAGE APP */
