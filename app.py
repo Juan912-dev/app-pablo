@@ -105,9 +105,10 @@ st.markdown(
         color: #D48B38 !important;
     }
 
-    /* PANTALLA DE LOGIN / PORTADA */
+    /* PANTALLA DE LOGIN / PORTADA (AMPLIADA) */
     .login-container {
-        max-width: 500px;
+        width: 100%;
+        max-width: 850px; /* Ampliado a tamaño amplio de escritorio */
         margin: 2rem auto;
         background-color: #0A1B2E;
         border: 1px solid #1A3656;
@@ -115,6 +116,7 @@ st.markdown(
         padding: 2.5rem 2rem;
         text-align: center;
         box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        box-sizing: border-box;
     }
 
     .login-logo {
@@ -125,6 +127,12 @@ st.markdown(
         border: 2px solid #D48B38;
         box-shadow: 0 0 25px rgba(212, 139, 56, 0.3);
         margin-bottom: 1rem;
+    }
+
+    /* FORZAR AMPLITUD TOTAL EN FORMULARIOS ENTRADAS E INPUTS */
+    [data-testid="stForm"], .stTextInput, .stPasswordInput, div[data-baseweb="input"] {
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     /* BARRA NAVEGACIÓN SUPERIOR */
@@ -162,7 +170,7 @@ st.markdown(
         white-space: nowrap;
     }
 
-    /* BARRA DE ESTADO DEL PAQUETE (FIJA AL HACER SCROLL) */
+    /* BARRA DE ESTADO DEL PAQUETE */
     .role-subbar {
         background-color: #091626;
         border-bottom: 1px solid #D48B38;
@@ -320,21 +328,23 @@ st.markdown(
         border-color: #D48B38 !important;
     }
 
-    /* 📱 ADAPTACIÓN DE ANCHO COMPLETO PARA CELULARES (MOBILE FULL-WIDTH) */
+    /* 📱 ADAPTACIÓN DE ANCHO ULTRA MAXIMIZADO EN CELULAR */
     @media (max-width: 768px) {
-        /* Quita los márgenes blancos/oscuros laterales de Streamlit en celular */
+        /* Quita los márgenes blancos/oscuros laterales de la app de Streamlit */
         .block-container, [data-testid="stMainBlockContainer"] {
-            padding-left: 0.4rem !important;
-            padding-right: 0.4rem !important;
+            padding-left: 0.2rem !important;
+            padding-right: 0.2rem !important;
         }
 
-        /* Fuerza a las columnas de Streamlit a tomar el 100% de ancho */
+        /* Fuerza a TODAS las columnas a ocupar el 100% real de la pantalla */
         [data-testid="stColumn"], [data-testid="column"] {
             width: 100% !important;
             min-width: 100% !important;
+            flex: 1 1 100% !important;
+            max-width: 100% !important;
             padding-left: 0 !important;
             padding-right: 0 !important;
-            margin-bottom: 1rem !important;
+            margin-bottom: 0.8rem !important;
         }
 
         /* 1. Navbar responsive */
@@ -356,28 +366,28 @@ st.markdown(
             padding-top: 8px !important;
         }
 
-        /* 2. Pantalla de Bienvenida / Login maximizada */
+        /* 2. Tarjeta de Login en ancho completo */
         .login-container {
-            width: 98% !important;
-            max-width: 98% !important;
-            padding: 1.8rem 1rem !important;
-            margin: 0.5rem auto !important;
-            box-sizing: border-box !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 1.5rem 0.8rem !important;
+            margin: 0 auto !important;
+            border-radius: 14px !important;
         }
 
         .login-container h1, .login-container h2 {
-            font-size: 1.7rem !important;
+            font-size: 1.8rem !important;
             word-break: normal !important;
         }
 
-        /* 3. Paquetes y Misión: Ancho total y padding reducido para máxima amplitud */
+        /* 3. Paquetes, Misión y Bloques */
         .mission-card, .feature-box, .banner-hero-box {
             width: 100% !important;
             padding: 1.2rem 0.8rem !important;
             box-sizing: border-box !important;
         }
 
-        /* 4. Disposición vertical de bloques */
+        /* Disposición vertical de todos los bloques horizontales */
         [data-testid="stHorizontalBlock"] {
             flex-direction: column !important;
             gap: 1rem !important;
@@ -388,7 +398,7 @@ st.markdown(
             min-width: 100% !important;
         }
 
-        /* Excepción: Botones superiores (Perfil y Caja) se mantienen en 2 columnas paralelas */
+        /* Excepción: Botones superiores de Perfil/Caja lado a lado */
         .block-container > div:nth-child(2) [data-testid="stHorizontalBlock"],
         div:has(> [data-testid="stHorizontalBlock"]) [data-testid="stHorizontalBlock"]:first-child {
             flex-direction: row !important;
