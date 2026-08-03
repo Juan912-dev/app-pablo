@@ -56,6 +56,19 @@ IMG_ESPIRAL = get_base64_image("espiral.png")
 # ==========================================
 st.markdown(
     """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+    /* Reset global */
+    html, body, [data-testid="stAppViewContainer"] {
+        background-color: #071220 !important;
+        color: #F1F5F9;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    [data-testid="stHeader"] { background: transparent !important; }
+    #MainMenu, footer { visibility: hidden; }
+
     /* BARRA FLOTANTE INFERIOR FIJA PARA EL CARRITO */
     .floating-cart-bar {
         position: fixed;
@@ -71,18 +84,6 @@ st.markdown(
         justify-content: space-between;
         align-items: center;
     }
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
-    /* Reset global */
-    html, body, [data-testid="stAppViewContainer"] {
-        background-color: #071220 !important;
-        color: #F1F5F9;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    [data-testid="stHeader"] { background: transparent !important; }
-    #MainMenu, footer { visibility: hidden; }
 
     /* PANTALLA DE LOGIN / PORTADA */
     .login-container {
@@ -813,17 +814,30 @@ with top_c2:
             show_cart_dialog()
 
 # ==========================================
-# 9. SUB-BARRA DE ESTADO DEL PAQUETE
+# 9. BARRA FLOTANTE FIJA DEL CARRITO (SIEMPRE VISIBLE Y CLICABLE)
 # ==========================================
 pkg_active_name = st.session_state.selected_package["name"]
+
 st.markdown(
     f"""
-    <div class="role-subbar">
-        <div>📦 <strong>{pkg_active_name}:</strong> {current_cart_count} de {target_quota} productos en tu caja</div>
+    <div class="floating-cart-bar">
+        <div>
+            <span style="color: #D48B38; font-weight: 700; font-size: 1rem;">📦 {pkg_active_name}</span><br/>
+            <span style="color: #F1F5F9; font-size: 0.85rem;">{current_cart_count} de {target_quota} productos en tu caja</span>
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
+
+col_espacio, col_boton_flotante = st.columns([4, 2])
+with col_boton_flotante:
+    if st.button(
+        f"🛒 Ver mi Caja ({current_cart_count}/{target_quota})",
+        key="btn_cart_floating",
+        use_container_width=True
+    ):
+        show_cart_dialog()
 
 # ==========================================
 # 10. SECCIÓN HERO CENTRAL CON LOGO OFICIAL
