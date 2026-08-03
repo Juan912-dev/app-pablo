@@ -981,7 +981,7 @@ with col_u:
         else f"👤 {user_name}"
     )
     if is_guest:
-        label_user += " (Inv)"
+        label_user += " (Invitado)"
     if st.button(label_user, use_container_width=True):
         show_auth_dialog()
 
