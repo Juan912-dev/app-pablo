@@ -112,13 +112,17 @@ st.markdown(
         border: 1px solid #D48B38;
     }
 
-    /* BARRA DE ESTADO DEL PAQUETE */
+    /* BARRA DE ESTADO DEL PAQUETE (FIJA AL HACER SCROLL) */
     .role-subbar {
         background-color: #091626;
-        border-bottom: 1px solid #13243A;
-        padding: 0.6rem 2rem;
-        font-size: 0.85rem;
-        color: #94A3B8;
+        border-bottom: 1px solid #D48B38;
+        padding: 0.8rem 2rem;
+        font-size: 0.95rem;
+        color: #F1F5F9;
+        position: sticky;
+        top: 65px;
+        z-index: 998;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
 
     /* BANNER HERO Y SECCIÓN CENTRAL */
@@ -271,7 +275,7 @@ st.markdown(
 )
 
 USER_FILE = "usuarios.json"
-WHATSAPP_NUMBER = "5493530000000"
+WHATSAPP_NUMBER = "549353650965"
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -726,7 +730,7 @@ def show_cart_dialog():
             # Botón para confirmar el pedido y guardarlo
             if st.button("📲 Confirmar Pedido y Registrar", use_container_width=True):
                 if save_order():
-                    st.success("¡Pedido registrado con éxito en la planilla!")
+                    st.success("Pedido registrado")  # <-- CAMBIO AQUÍ
                     wa_url = get_whatsapp_link()
                     st.markdown(
                         f"""
