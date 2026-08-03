@@ -301,6 +301,16 @@ st.markdown(
         color: #071220 !important;
         border-color: #D48B38 !important;
     }
+
+    /* OCULTAR BARRA SUPERIOR Y TOOLBAR DE STREAMLIT */
+    header {visibility: hidden !important; display: none !important;}
+    [data-testid="stHeader"] {display: none !important;}
+    [data-testid="stToolbar"] {visibility: hidden !important; display: none !important;}
+    
+    /* OCULTAR FOOTER Y BOTÓN DE MANAGE APP */
+    footer {visibility: hidden !important; display: none !important;}
+    [data-testid="stStatusWidget"] {visibility: hidden !important; display: none !important;}
+    
     </style>
     """,
     unsafe_allow_html=True,
